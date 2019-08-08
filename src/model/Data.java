@@ -16,7 +16,7 @@ public class Data {
     }
 
     @Override
-    protected Data clone() throws CloneNotSupportedException {
+    public Data clone() {
         return new Data();
     }
 }
