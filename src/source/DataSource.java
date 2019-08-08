@@ -1,6 +1,7 @@
 package source;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import model.Data;
 
 /*************
@@ -23,11 +24,22 @@ public class DataSource {
     }
 
     public Observable<Data> getDataFromDisk() {
-        return diskSource.getData();
+        return diskSource.getData().doAfterNext(new Consumer<Data>() {
+            @Override
+            public void accept(Data data) throws Exception {
+                memorySource.saveToMemory(data);
+            }
+        });
     }
 
     public Observable<Data> getDataFromNetwork() {
-        return networkSource.getData();
+        return networkSource.getData().doOnNext(new Consumer<Data>() {
+            @Override
+            public void accept(Data data) throws Exception {
+                diskSource.saveToDisk(data);
+                memorySource.saveToMemory(data);
+            }
+        });
     }
 
 }
